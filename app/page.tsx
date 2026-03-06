@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 const CITIES = [
   { code: "dubai", name: "Dubai", airport: "DXB", country: "UAE", active: true, flag: "🇦🇪" },
@@ -553,7 +554,6 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
   const [phone, setPhone] = useState("");
   const [airlines, setAirlines] = useState<string[]>([]);
   const [budget, setBudget] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -575,37 +575,27 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     setScanning(true);
-    setTimeout(() => { setScanning(false); setSubmitted(true); }, 2500);
+    try {
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ origin }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Checkout failed");
+      if (data.url) window.location.href = data.url;
+      else throw new Error("No checkout URL");
+    } catch (err) {
+      setScanning(false);
+      setErrors({ form: err instanceof Error ? err.message : "Payment could not be started" });
+    }
   };
 
   const dayLabels: Record<string, string> = { "0": "Today", "1": "Tomorrow", "2": "Day after" };
-
-  if (submitted) {
-    return (
-      <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Newsreader', serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-        <div style={{ textAlign: "center", maxWidth: "420px" }}>
-          <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "rgba(22,163,74,0.1)", border: "1px solid rgba(22,163,74,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", margin: "0 auto 32px", color: C.green }}>✓</div>
-          <h2 style={{ fontSize: "36px", fontWeight: "400", letterSpacing: "-0.02em", marginBottom: "16px", color: C.text }}>
-            Monitoring <em style={{ color: C.accent }}>activated.</em>
-          </h2>
-          <p style={{ color: C.textMid, lineHeight: "1.8", fontSize: "14px", marginBottom: "8px", fontFamily: "ui-monospace, monospace" }}>
-            Hi {name.split(" ")[0]}, we&apos;re scanning all departures from Dubai every 5 minutes.
-          </p>
-          <p style={{ color: C.textMid, lineHeight: "1.8", fontSize: "14px", marginBottom: "32px", fontFamily: "ui-monospace, monospace" }}>
-            You&apos;ll receive a WhatsApp on <strong style={{ color: C.text }}>{countryCode.code} {phone}</strong> as soon as we find seats within your ${Number(budget).toLocaleString()} budget.
-          </p>
-          <div style={{ padding: "18px 24px", borderRadius: "12px", border: `1px solid ${C.border}`, background: "#fff", fontSize: "13px", color: C.textMid, lineHeight: "1.8", fontFamily: "ui-monospace, monospace", marginBottom: "32px" }}>
-            Active for <span style={{ color: C.text, fontWeight: "500" }}>48 hours</span> · Reply <span style={{ color: C.text, fontWeight: "500" }}>STOP</span> to cancel anytime
-          </div>
-          <button onClick={onBack} style={{ background: "transparent", border: `1px solid ${C.border}`, color: C.textMid, padding: "10px 24px", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontFamily: "ui-monospace, monospace" }}>← Back to cities</button>
-        </div>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap'); * { box-sizing: border-box; }`}</style>
-      </div>
-    );
-  }
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Newsreader', serif", color: C.text }}>
@@ -627,6 +617,21 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
           <p style={{ color: C.textMid, fontSize: "14px", lineHeight: "1.7", fontFamily: "ui-monospace, monospace" }}>
             We&apos;ll alert you on WhatsApp the moment seats become available.
           </p>
+        </div>
+
+        <div style={{
+          background: "rgba(45,27,105,0.06)",
+          border: "1px solid rgba(45,27,105,0.12)",
+          borderRadius: "10px",
+          padding: "14px 18px",
+          marginBottom: "32px",
+          fontSize: "12px",
+          fontFamily: "ui-monospace, monospace",
+          color: C.textMid,
+          lineHeight: "1.6",
+          letterSpacing: "0.02em",
+        }}>
+          After setting your preferences, you&apos;ll be redirected to complete a secure $20 payment. Monitoring activates instantly once payment is confirmed.
         </div>
 
         {/* Name */}
@@ -732,6 +737,11 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
           </div>
         </Section>
 
+        {errors.form && (
+          <div style={{ marginBottom: "16px", fontSize: "12px", color: C.error, fontFamily: "ui-monospace, monospace" }}>
+            {errors.form}
+          </div>
+        )}
         {/* Submit */}
         <button
           onClick={handleSubmit}
@@ -747,7 +757,7 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
           onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = "#1e1154"}
           onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = C.accent}
         >
-          {scanning ? "Activating..." : "Start monitoring →"}
+          {scanning ? "Redirecting to payment..." : "Continue to Payment →"}
         </button>
         <div style={{ textAlign: "center", fontSize: "12px", color: C.textLight, marginTop: "12px", fontFamily: "ui-monospace, monospace" }}>
           48 hours of monitoring · Cancel anytime · Secure payment via Stripe
@@ -790,9 +800,10 @@ function Counter({ label, value, min, max, onChange }: { label: string; value: n
   );
 }
 
-// ── App Router ────────────────────────────────────────────────
-export default function App() {
+// ── App (uses useSearchParams, must be inside Suspense) ─────────
+function AppInner() {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
   const [page, setPage] = useState("landing");
   const [city, setCity] = useState<string | null>(null);
   const [user, setUser] = useState<{ email: string } | null>(null);
@@ -809,6 +820,17 @@ export default function App() {
     }
   }, [status, session?.user?.email]);
 
+  // Restore Dubai form when returning from Stripe cancel (/dubai -> /?city=dubai)
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.user?.email) return;
+    if (searchParams.get("city") === "dubai") {
+      setUser({ email: session.user.email });
+      setCity("dubai");
+      setPage("city");
+      if (typeof window !== "undefined") window.history.replaceState({}, "", "/");
+    }
+  }, [status, session?.user?.email, searchParams]);
+
   if (page === "city" && city === "dubai") {
     if (!user) {
       return <AuthPage onAuth={(u) => setUser(u)} onBack={() => setPage("landing")} />;
@@ -816,4 +838,19 @@ export default function App() {
     return <DubaiPage user={user} onBack={() => { setPage("landing"); setUser(null); }} />;
   }
   return <LandingPage onSelectCity={(code) => { setCity(code); setPage("city"); }} />;
+}
+
+// ── App Router ────────────────────────────────────────────────
+export default function App() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Newsreader', serif", color: C.textMid }}>
+          Loading…
+        </div>
+      }
+    >
+      <AppInner />
+    </Suspense>
+  );
 }
