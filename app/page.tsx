@@ -91,7 +91,7 @@ const inputStyle = (focused: boolean, error: boolean) => ({
 });
 
 // ── Landing Page ──────────────────────────────────────────────
-function LandingPage({ onSelectCity }: { onSelectCity: (code: string) => void }) {
+function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => void; user?: { email: string } | null }) {
   return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Newsreader', Georgia, serif", color: C.text }}>
       <nav style={{
@@ -107,15 +107,20 @@ function LandingPage({ onSelectCity }: { onSelectCity: (code: string) => void })
           }}>✈</div>
           <span style={{ fontSize: "16px", fontWeight: "600", color: C.text, letterSpacing: "-0.01em", fontFamily: "'Newsreader', serif" }}>SOSAirways</span>
         </div>
-        <div style={{
-          display: "flex", alignItems: "center", gap: "7px",
-          fontSize: "12px", fontFamily: "ui-monospace, monospace",
-          color: C.green, letterSpacing: "0.05em",
-          background: "rgba(22,163,74,0.08)", padding: "6px 12px",
-          borderRadius: "100px", border: "1px solid rgba(22,163,74,0.2)",
-        }}>
-          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: C.green, animation: "blink 2s infinite" }} />
-          LIVE MONITORING
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {user && (
+            <a href="/dashboard" style={{ fontSize: "13px", fontFamily: "ui-monospace, monospace", color: C.accent, textDecoration: "none" }}>Dashboard</a>
+          )}
+          <div style={{
+            display: "flex", alignItems: "center", gap: "7px",
+            fontSize: "12px", fontFamily: "ui-monospace, monospace",
+            color: C.green, letterSpacing: "0.05em",
+            background: "rgba(22,163,74,0.08)", padding: "6px 12px",
+            borderRadius: "100px", border: "1px solid rgba(22,163,74,0.2)",
+          }}>
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: C.green, animation: "blink 2s infinite" }} />
+            LIVE MONITORING
+          </div>
         </div>
       </nav>
 
@@ -580,10 +585,31 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
     setScanning(true);
     try {
       const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const draftRes = await fetch("/api/monitoring/draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          phone: phone.trim(),
+          country_code: countryCode.code,
+          country_iso: countryCode.iso,
+          continents,
+          adults,
+          children,
+          days,
+          budget: budget.trim(),
+          airlines,
+        }),
+      });
+      const draftData = await draftRes.json();
+      if (!draftRes.ok) throw new Error(draftData.error || "Failed to save preferences");
+      const monitoringSessionId = draftData.id;
+      if (!monitoringSessionId) throw new Error("No session id returned");
+
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ origin }),
+        body: JSON.stringify({ origin, monitoring_session_id: monitoringSessionId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Checkout failed");
@@ -603,6 +629,7 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
         <button onClick={onBack} style={{ background: "transparent", border: "none", color: C.textMid, cursor: "pointer", fontSize: "13px", fontFamily: "ui-monospace, monospace" }}>← SOSAirways</button>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           {user && <span style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace", color: C.textMid }}>{user.email}</span>}
+          <a href="/dashboard" style={{ fontSize: "13px", fontFamily: "ui-monospace, monospace", color: C.accent, textDecoration: "none" }}>Dashboard</a>
           <div style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace", color: C.textMid, border: `1px solid ${C.border}`, padding: "6px 14px", borderRadius: "100px", display: "flex", alignItems: "center", gap: "8px", background: "#fff" }}>
             <span>🇦🇪</span> Dubai · DXB
           </div>
@@ -837,7 +864,7 @@ function AppInner() {
     }
     return <DubaiPage user={user} onBack={() => { setPage("landing"); setUser(null); }} />;
   }
-  return <LandingPage onSelectCity={(code) => { setCity(code); setPage("city"); }} />;
+  return <LandingPage onSelectCity={(code) => { setCity(code); setPage("city"); }} user={session?.user?.email ? { email: session.user.email } : null} />;
 }
 
 // ── App Router ────────────────────────────────────────────────

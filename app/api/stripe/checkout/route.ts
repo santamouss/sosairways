@@ -9,7 +9,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const origin = (body.origin as string) || request.headers.get("origin") || "http://localhost:3000";
-    const successUrl = `${origin}/dubai/success`;
+    const monitoringId = body.monitoring_session_id as string | undefined;
+    const successUrl = monitoringId
+      ? `${origin}/dubai/success?monitoring_id=${encodeURIComponent(monitoringId)}&session_id={CHECKOUT_SESSION_ID}`
+      : `${origin}/dubai/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${origin}/dubai`;
 
     const session = await stripe.checkout.sessions.create({
