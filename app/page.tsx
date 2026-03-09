@@ -859,6 +859,13 @@ function AppInner() {
   }, [status, session?.user?.email, searchParams]);
 
   if (page === "city" && city === "dubai") {
+    if (status === "loading") {
+      return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "ui-monospace, monospace", color: "#6b6b6b" }}>Loading…</div>;
+    }
+    if (!user && status === "authenticated" && session?.user?.email) {
+      setUser({ email: session.user.email });
+      return null;
+    }
     if (!user) {
       return <AuthPage onAuth={(u) => setUser(u)} onBack={() => setPage("landing")} />;
     }
