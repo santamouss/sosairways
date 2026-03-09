@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (!data) {
-      return NextResponse.json({ error: "Session not found or already activated" }, { status: 404 });
+      // Session already activated (e.g. by Stripe webhook) — treat as success
+      return NextResponse.json({ ok: true });
     }
 
     return NextResponse.json({ ok: true, session: data });
