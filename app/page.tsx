@@ -151,11 +151,11 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
           </div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", gap: "clamp(16px, 5vw, 48px)", marginBottom: "64px", paddingBottom: "48px", borderBottom: `1px solid ${C.border}`, overflow: "hidden" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "clamp(16px, 6vw, 48px)", marginBottom: "64px", paddingBottom: "48px", borderBottom: `1px solid ${C.border}`, overflowX: "hidden", width: "100%" }}>
           {[{ val: "48+", label: "Flights monitored" }, { val: "5 min", label: "Scan interval" }, { val: "3 days", label: "Forward coverage" }].map(s => (
-            <div key={s.label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "28px", fontWeight: "500", color: C.text, letterSpacing: "-0.02em" }}>{s.val}</div>
-              <div style={{ fontSize: "12px", color: C.textLight, fontFamily: "ui-monospace, monospace", marginTop: "4px", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>{s.label}</div>
+            <div key={s.label} style={{ textAlign: "center", minWidth: 0 }}>
+              <div style={{ fontSize: "clamp(20px, 5vw, 28px)", fontWeight: "500", color: C.text, letterSpacing: "-0.02em" }}>{s.val}</div>
+              <div style={{ fontSize: "11px", color: C.textLight, fontFamily: "ui-monospace, monospace", marginTop: "4px", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>{s.label}</div>
             </div>
           ))}
         </div>
