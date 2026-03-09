@@ -155,7 +155,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
           {[{ val: "48+", label: "Flights monitored" }, { val: "5 min", label: "Scan interval" }, { val: "3 days", label: "Forward coverage" }].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
               <div style={{ fontSize: "28px", fontWeight: "500", color: C.text, letterSpacing: "-0.02em" }}>{s.val}</div>
-              <div style={{ fontSize: "12px", color: C.textLight, fontFamily: "ui-monospace, monospace", marginTop: "4px", letterSpacing: "0.05em" }}>{s.label}</div>
+              <div style={{ fontSize: "12px", color: C.textLight, fontFamily: "ui-monospace, monospace", marginTop: "4px", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>{s.label}</div>
             </div>
           ))}
         </div>
