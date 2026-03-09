@@ -135,9 +135,9 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
           Emergency Evacuation Flight Service
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "48px", marginBottom: "56px" }}>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: "clamp(48px, 7vw, 88px)", lineHeight: "1.04", fontWeight: "400", letterSpacing: "-0.03em", margin: "0 0 28px", color: C.text }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "48px", marginBottom: "56px", flexWrap: "wrap" }}>
+          <div style={{ flex: 1, minWidth: "280px" }}>
+            <h1 style={{ fontSize: "clamp(36px, 5vw, 88px)", lineHeight: "1.04", fontWeight: "400", letterSpacing: "-0.03em", margin: "0 0 28px", color: C.text }}>
               We find the flights.<br />
               <span style={{ color: C.accent, fontStyle: "italic" }}>So you can focus on getting home.</span>
             </h1>
@@ -146,7 +146,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
               and send you a WhatsApp alert the moment seats open up.
             </p>
           </div>
-          <div style={{ flexShrink: 0, width: "320px" }}>
+          <div style={{ flexShrink: 0, width: "min(320px, 100%)" }}>
             <img src="/sosairways_iphone.png" alt="SOS Airways WhatsApp alerts" style={{ width: "100%", height: "auto" }} />
           </div>
         </div>
