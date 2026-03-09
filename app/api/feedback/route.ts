@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "feedback@sosairways.com",
+      from: "SOSAirways Feedback <feedback@whatareyouvibecoding.com>",
       to: "mustapha.maa@gmail.com",
       subject: `[SOSAirways Feedback] ${subject}`,
       text: `From: ${email}\n\nSubject: ${subject}\n\nDescription:\n${description}`,
