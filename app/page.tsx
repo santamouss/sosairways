@@ -841,6 +841,7 @@ function AppInner() {
   const [city, setCity] = useState<string | null>(null);
   const [user, setUser] = useState<{ email: string } | null>(null);
   const router = useRouter();
+  const feedbackEmail = session?.user?.email ?? null;
 
   // Restore flow after Google OAuth callback
   useEffect(() => {
@@ -884,18 +885,103 @@ function AppInner() {
 
   if (page === "city" && city === "dubai") {
     if (status === "loading") {
-      return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "ui-monospace, monospace", color: "#6b6b6b" }}>Loading…</div>;
+      return (
+        <>
+          <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "ui-monospace, monospace", color: "#6b6b6b" }}>Loading…</div>
+          <FeedbackWidget userEmail={feedbackEmail} />
+        </>
+      );
     }
     if (!user && status === "authenticated" && session?.user?.email) {
       setUser({ email: session.user.email });
       return null;
     }
     if (!user) {
-      return <AuthPage onAuth={(u) => setUser(u)} onBack={() => setPage("landing")} />;
+      return (
+        <>
+          <AuthPage onAuth={(u) => setUser(u)} onBack={() => setPage("landing")} />
+          <FeedbackWidget userEmail={feedbackEmail} />
+        </>
+      );
     }
-    return <DubaiPage user={user} onBack={() => { setPage("landing"); setUser(null); }} />;
+    return (
+      <>
+        <DubaiPage user={user} onBack={() => { setPage("landing"); setUser(null); }} />
+        <FeedbackWidget userEmail={feedbackEmail} />
+      </>
+    );
   }
-  return <LandingPage onSelectCity={(code) => { setCity(code); setPage("city"); }} user={session?.user?.email ? { email: session.user.email } : null} />;
+  return (
+    <>
+      <LandingPage onSelectCity={(code) => { setCity(code); setPage("city"); }} user={session?.user?.email ? { email: session.user.email } : null} />
+      <FeedbackWidget userEmail={feedbackEmail} />
+    </>
+  );
+}
+
+function FeedbackWidget({ userEmail }: { userEmail?: string | null }) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState(userEmail || "");
+  const [subject, setSubject] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const handleSubmit = async () => {
+    if (!subject || !description || (!userEmail && !email)) return;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail || email, subject, description }),
+      });
+      if (!res.ok) throw new Error();
+      setStatus("sent");
+      setTimeout(() => { setOpen(false); setStatus("idle"); setSubject(""); setDescription(""); setEmail(userEmail || ""); }, 2000);
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", bottom: "24px", right: "24px", zIndex: 1000 }}>
+      {open && (
+        <div style={{ position: "absolute", bottom: "56px", right: 0, width: "320px", background: "#fff", border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <span style={{ fontSize: "15px", fontFamily: "'Newsreader', serif", fontWeight: "500", color: C.text }}>Send feedback</span>
+            <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.textLight, fontSize: "18px" }}>×</button>
+          </div>
+          {status === "sent" ? (
+            <div style={{ textAlign: "center", padding: "16px 0", color: C.green, fontFamily: "ui-monospace, monospace", fontSize: "13px" }}>✓ Feedback sent!</div>
+          ) : (
+            <>
+              {!userEmail && (
+                <div style={{ marginBottom: "12px" }}>
+                  <label style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace", color: C.textMid, letterSpacing: "0.05em", display: "block", marginBottom: "6px" }}>YOUR EMAIL</label>
+                  <input type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle(false, false)} />
+                </div>
+              )}
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace", color: C.textMid, letterSpacing: "0.05em", display: "block", marginBottom: "6px" }}>SUBJECT</label>
+                <input type="text" placeholder="What's this about?" value={subject} onChange={e => setSubject(e.target.value)} style={inputStyle(false, false)} />
+              </div>
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace", color: C.textMid, letterSpacing: "0.05em", display: "block", marginBottom: "6px" }}>DESCRIPTION</label>
+                <textarea placeholder="Tell us more..." value={description} onChange={e => setDescription(e.target.value)} rows={4} style={{ ...inputStyle(false, false), resize: "none" as const }} />
+              </div>
+              {status === "error" && <div style={{ fontSize: "12px", color: C.error, marginBottom: "8px", fontFamily: "ui-monospace, monospace" }}>Something went wrong. Try again.</div>}
+              <button onClick={handleSubmit} disabled={status === "sending" || !subject || !description || (!userEmail && !email)} style={{ width: "100%", padding: "11px", borderRadius: "8px", background: C.accent, border: "none", color: "#fff", fontSize: "13px", fontFamily: "ui-monospace, monospace", cursor: "pointer" }}>
+                {status === "sending" ? "Sending..." : "Send feedback →"}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      <button onClick={() => setOpen(!open)} style={{ width: "44px", height: "44px", borderRadius: "50%", background: C.accent, border: "none", color: "#fff", fontSize: "20px", cursor: "pointer", boxShadow: "0 4px 16px rgba(45,27,105,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        💬
+      </button>
+    </div>
+  );
 }
 
 // ── App Router ────────────────────────────────────────────────
