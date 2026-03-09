@@ -177,6 +177,30 @@ function DubaiSuccessContent() {
           Active for <span style={{ color: C.text, fontWeight: "500" }}>48 hours</span> · Reply{" "}
           <span style={{ color: C.text, fontWeight: "500" }}>STOP</span> to cancel anytime
         </div>
+        <div
+          style={{
+            padding: "18px 24px",
+            borderRadius: "12px",
+            border: `1px solid ${C.border}`,
+            background: "#fff",
+            fontSize: "13px",
+            color: C.textMid,
+            lineHeight: "1.8",
+            fontFamily: "ui-monospace, monospace",
+            marginBottom: "32px",
+          }}
+        >
+          To receive your first alert, send us a WhatsApp message at{" "}
+          <a
+            href="https://wa.me/14153902946"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: C.accent, textDecoration: "none", fontWeight: "500" }}
+          >
+            +1 (415) 390-2946
+          </a>
+          . We&apos;ll take it from there.
+        </div>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
           <Link
             href="/dashboard"
