@@ -135,15 +135,21 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
           Emergency Evacuation Flight Service
         </div>
 
-        <h1 style={{ fontSize: "clamp(48px, 7vw, 88px)", lineHeight: "1.04", fontWeight: "400", letterSpacing: "-0.03em", margin: "0 0 28px", color: C.text }}>
-          We find the flights.<br />
-          <span style={{ color: C.accent, fontStyle: "italic" }}>You focus on what matters.</span>
-        </h1>
-
-        <p style={{ fontSize: "15px", lineHeight: "1.8", color: C.textMid, maxWidth: "520px", margin: "0 auto 56px", fontFamily: "ui-monospace, monospace" }}>
-          Real-time flight monitoring during crises. We scan every departure every 5 minutes
-          and send you a WhatsApp alert the moment seats open up.
-        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "48px", marginBottom: "56px" }}>
+          <div style={{ flex: 1 }}>
+            <h1 style={{ fontSize: "clamp(48px, 7vw, 88px)", lineHeight: "1.04", fontWeight: "400", letterSpacing: "-0.03em", margin: "0 0 28px", color: C.text }}>
+              We find the flights.<br />
+              <span style={{ color: C.accent, fontStyle: "italic" }}>So you can focus on getting home.</span>
+            </h1>
+            <p style={{ fontSize: "15px", lineHeight: "1.8", color: C.textMid, maxWidth: "520px", margin: "0 0 56px", fontFamily: "ui-monospace, monospace" }}>
+              Real-time flight monitoring during crises. We scan every departure every 5 minutes
+              and send you a WhatsApp alert the moment seats open up.
+            </p>
+          </div>
+          <div style={{ flexShrink: 0, width: "320px" }}>
+            <img src="/sosairways_iphone.png" alt="SOS Airways WhatsApp alerts" style={{ width: "100%", height: "auto" }} />
+          </div>
+        </div>
 
         <div style={{ display: "flex", justifyContent: "center", gap: "48px", marginBottom: "64px", paddingBottom: "48px", borderBottom: `1px solid ${C.border}` }}>
           {[{ val: "48+", label: "Flights monitored" }, { val: "5 min", label: "Scan interval" }, { val: "3 days", label: "Forward coverage" }].map(s => (
