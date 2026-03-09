@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const CITIES = [
   { code: "dubai", name: "Dubai", airport: "DXB", country: "UAE", active: true, flag: "🇦🇪" },
@@ -834,6 +834,7 @@ function AppInner() {
   const [page, setPage] = useState("landing");
   const [city, setCity] = useState<string | null>(null);
   const [user, setUser] = useState<{ email: string } | null>(null);
+  const router = useRouter();
 
   // Restore flow after Google OAuth callback
   useEffect(() => {
@@ -846,6 +847,23 @@ function AppInner() {
       window.sessionStorage.removeItem("auth_return");
     }
   }, [status, session?.user?.email]);
+
+  // If logged-in user clicks Dubai and has active session, redirect to dashboard
+  useEffect(() => {
+    if (page !== "city" || city !== "dubai") return;
+    if (status !== "authenticated" || !session?.user?.email) return;
+    const userEmail = session.user.email;
+    fetch("/api/monitoring/active")
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.session) {
+          router.replace("/dashboard");
+        } else {
+          setUser({ email: userEmail });
+        }
+      })
+      .catch(() => setUser({ email: userEmail }));
+  }, [page, city, status, session?.user?.email]);
 
   // Restore Dubai form when returning from Stripe cancel (/dubai -> /?city=dubai)
   useEffect(() => {
