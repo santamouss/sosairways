@@ -96,7 +96,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Newsreader', Georgia, serif", color: C.text }}>
       <nav style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "20px 48px", borderBottom: `1px solid ${C.border}`,
+        padding: "20px clamp(16px, 5vw, 48px)", borderBottom: `1px solid ${C.border}`,
         background: C.bg, position: "sticky", top: 0, zIndex: 10,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -124,7 +124,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
         </div>
       </nav>
 
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "88px 48px 72px", textAlign: "center" }}>
+      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "clamp(40px, 8vw, 88px) clamp(16px, 5vw, 48px) 72px", textAlign: "center" }}>
         <div style={{
           display: "inline-flex", alignItems: "center", gap: "6px",
           fontSize: "12px", fontFamily: "ui-monospace, monospace",
@@ -151,7 +151,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
           </div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", gap: "48px", marginBottom: "64px", paddingBottom: "48px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "clamp(16px, 5vw, 48px)", marginBottom: "64px", paddingBottom: "48px", borderBottom: `1px solid ${C.border}`, overflow: "hidden" }}>
           {[{ val: "48+", label: "Flights monitored" }, { val: "5 min", label: "Scan interval" }, { val: "3 days", label: "Forward coverage" }].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
               <div style={{ fontSize: "28px", fontWeight: "500", color: C.text, letterSpacing: "-0.02em" }}>{s.val}</div>
