@@ -99,7 +99,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
         padding: "20px clamp(16px, 5vw, 48px)", borderBottom: `1px solid ${C.border}`,
         background: C.bg, position: "sticky", top: 0, zIndex: 10,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
           <div style={{
             width: "30px", height: "30px", borderRadius: "8px",
             background: C.accent, display: "flex", alignItems: "center",
@@ -107,7 +107,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
           }}>✈</div>
           <span style={{ fontSize: "16px", fontWeight: "600", color: C.text, letterSpacing: "-0.01em", fontFamily: "'Newsreader', serif" }}>SOSAirways</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", minWidth: 0 }}>
           {user && (
             <a href="/dashboard" style={{ fontSize: "13px", fontFamily: "ui-monospace, monospace", color: C.accent, textDecoration: "none" }}>Dashboard</a>
           )}
@@ -119,7 +119,7 @@ function LandingPage({ onSelectCity, user }: { onSelectCity: (code: string) => v
             borderRadius: "100px", border: "1px solid rgba(22,163,74,0.2)",
           }}>
             <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: C.green, animation: "blink 2s infinite" }} />
-            LIVE MONITORING
+            ● LIVE
           </div>
         </div>
       </nav>
