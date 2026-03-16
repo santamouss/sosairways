@@ -1,3 +1,8 @@
+---
+name: frontend-ui
+description: You are working on the SOSAirways frontend UI layer.
+---
+
 You are working on the SOSAirways frontend UI layer.
 
 ## Scope

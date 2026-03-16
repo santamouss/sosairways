@@ -8,7 +8,7 @@ const CITIES = [
   { code: "dubai", name: "Dubai", airport: "DXB", country: "UAE", active: true, flag: "🇦🇪" },
   { code: "riyadh", name: "Riyadh", airport: "RUH", country: "Saudi Arabia", active: false, flag: "🇸🇦" },
   { code: "beirut", name: "Beirut", airport: "BEY", country: "Lebanon", active: false, flag: "🇱🇧" },
-  { code: "doha", name: "Doha", airport: "DOH", country: "Qatar", active: false, flag: "🇶🇦" },
+  { code: "doha", name: "Doha", airport: "DOH", country: "Qatar", active: true, flag: "🇶🇦" },
   { code: "kuwait", name: "Kuwait City", airport: "KWI", country: "Kuwait", active: false, flag: "🇰🇼" },
   { code: "amman", name: "Amman", airport: "AMM", country: "Jordan", active: false, flag: "🇯🇴" },
 ];

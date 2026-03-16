@@ -77,7 +77,7 @@ Supabase RLS is enforced in the pipeline (service role key bypasses it). The fro
 - `country_iso` — e.g. "AE"
 - `adults` — integer, number of adult passengers
 - `children` — integer, number of child passengers
-- `days` — array of days of the week the user wants to fly (e.g. ["Monday", "Friday"])
+- `days` — array of day-of-week numbers as strings (e.g. ["0","1","2"] where 0=Sunday, 6=Saturday)
 - `budget` — string (e.g. "500"); **inconsistency: pipeline reads `max_budget` as integer — do not fix yet**
 - `airlines` — array of preferred airline codes (can be empty)
 - `continents` — array of destination continents
@@ -190,7 +190,7 @@ In `pipeline.py` and `serpapi_check.py`, confirm there are no hardcoded `DXB` re
 | Dubai | DXB | ✅ Live |
 | Riyadh | RUH | 🔜 Soon |
 | Beirut | BEY | 🔜 Soon |
-| Doha | DOH | 🔜 Soon |
+| Doha | DOH | ✅ Live |
 | Kuwait | KWI | 🔜 Soon |
 
 ---

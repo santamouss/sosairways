@@ -1,3 +1,8 @@
+---
+name: new-airport
+description: You are performing a new airport rollout for SOSAirways. Follow this checklist in order. Do not skip steps.
+---
+
 You are performing a new airport rollout for SOSAirways. Follow this checklist in order. Do not skip steps.
 
 ## Pre-flight

@@ -1,3 +1,8 @@
+---
+name: payments
+description: You are working on the SOSAirways payments and session activation flow.
+---
+
 You are working on the SOSAirways payments and session activation flow.
 
 ## Scope
