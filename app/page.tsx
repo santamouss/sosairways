@@ -555,7 +555,7 @@ function AirlineSelector({ value, onChange }: { value: string[]; onChange: (v: s
 }
 
 // ── Dubai Page ────────────────────────────────────────────────
-function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: () => void }) {
+function DubaiPage({ user, city, onBack }: { user: { email: string } | null; city: string; onBack: () => void }) {
   const [continents, setContinents] = useState<string[]>([]);
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
@@ -605,6 +605,7 @@ function DubaiPage({ user, onBack }: { user: { email: string } | null; onBack: (
           days,
           budget: budget.trim(),
           airlines,
+          airport: CITIES.find(c => c.code === city)?.airport,
         }),
       });
       const draftData = await draftRes.json();
@@ -847,17 +848,17 @@ function AppInner() {
   useEffect(() => {
     if (status !== "authenticated" || !session?.user?.email) return;
     const returnTo = typeof window !== "undefined" ? window.sessionStorage.getItem("auth_return") : null;
-    if (returnTo === "dubai") {
+    if (returnTo) {
       setUser({ email: session.user.email });
-      setCity("dubai");
+      setCity(returnTo);
       setPage("city");
       window.sessionStorage.removeItem("auth_return");
     }
   }, [status, session?.user?.email]);
 
-  // If logged-in user clicks Dubai and has active session, redirect to dashboard
+  // If logged-in user clicks a city and has active session, redirect to dashboard
   useEffect(() => {
-    if (page !== "city" || city !== "dubai") return;
+    if (page !== "city" || !city) return;
     if (status !== "authenticated" || !session?.user?.email) return;
     const userEmail = session.user.email;
     fetch("/api/monitoring/active")
@@ -872,18 +873,19 @@ function AppInner() {
       .catch(() => setUser({ email: userEmail }));
   }, [page, city, status, session?.user?.email]);
 
-  // Restore Dubai form when returning from Stripe cancel (/dubai -> /?city=dubai)
+  // Restore city form when returning from Stripe cancel (/{city} -> /?city={code})
   useEffect(() => {
     if (status !== "authenticated" || !session?.user?.email) return;
-    if (searchParams.get("city") === "dubai") {
+    const cityParam = searchParams.get("city");
+    if (cityParam) {
       setUser({ email: session.user.email });
-      setCity("dubai");
+      setCity(cityParam);
       setPage("city");
       if (typeof window !== "undefined") window.history.replaceState({}, "", "/");
     }
   }, [status, session?.user?.email, searchParams]);
 
-  if (page === "city" && city === "dubai") {
+  if (page === "city" && city) {
     if (status === "loading") {
       return (
         <>
@@ -906,7 +908,7 @@ function AppInner() {
     }
     return (
       <>
-        <DubaiPage user={user} onBack={() => { setPage("landing"); setUser(null); }} />
+        <DubaiPage user={user} city={city} onBack={() => { setPage("landing"); setUser(null); }} />
         <FeedbackWidget userEmail={feedbackEmail} />
       </>
     );
